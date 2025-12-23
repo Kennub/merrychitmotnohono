@@ -151,7 +151,7 @@
         let state = 'TREE'; 
         let selectedIndex = 0;
         let handX = 0.5;
-
+        
         // ==========================================
         // 3. THREE.JS SYSTEM Vandiep
         // ==========================================
@@ -505,6 +505,14 @@
                     const wrist = lm[0];
                     let openDist = 0; tips.forEach(i => openDist += Math.hypot(lm[i].x-wrist.x, lm[i].y-wrist.y));
                     const avgDist = openDist / 4;
+                    const isHeart =
+                        results.multiHandLandmarks.length === 2 &&
+                        pinch1 < 0.06 &&
+                        pinch2 < 0.06 &&
+                        indexDist < 0.20 &&
+                        avgDist1 > 0.28 && avgDist1 < 0.38 &&
+                        avgDist2 > 0.28 && avgDist2 < 0.38;
+
                     const pinchDist = Math.hypot(lm[4].x-lm[8].x, lm[4].y-lm[8].y);
 
                     if (avgDist < 0.25) { 

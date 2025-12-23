@@ -57,7 +57,7 @@
     <div id="ui-layer">
         <div id="status" class="badge">🎄 Hép pi chít mớt Nờ Hờ Nờ iu iu iu iu iu 🎄</div>
         <div class="guide">
-            🖐 <b>Xòe:</b> Bung Quà & Đèn &nbsp;|&nbsp; 👌 <b>Pinch:</b> Xem ảnh &nbsp;|&nbsp; ✊ <b>Nắm:</b> Thu cây
+            🖐 <b>Xòe:</b> Bung Quà & Đèn &nbsp;|&nbsp; 👌 <b>Pinch:</b> Xem ảnh &nbsp;|&nbsp; ✊ <b>Nắm:</b> Thu cây &nbsp;|&nbsp; 🫶 <b>Heart:</b> SECRET!!!
         </div>
         <button id="btnStart" onclick="startSystem()">ZÔ!!!</button>
     </div>
@@ -255,7 +255,7 @@
             const borderGeo = new THREE.PlaneGeometry(9, 9); 
             const borderMat = new THREE.MeshBasicMaterial({ color: 0xFFD700 }); 
 
-            for(let i=0; i<5; i++) {
+            for(let i=0; i<photoFiles.length; i++) {
                 const mat = new THREE.MeshBasicMaterial({ 
                     map: photoTextures[i], side: THREE.DoubleSide 
                 });
@@ -305,27 +305,27 @@
             starMesh.position.set(0, CONFIG.treeHeight/2 + 2, 0);
             scene.add(starMesh);
             const loveCanvas = document.createElement('canvas');
-loveCanvas.width = 1024;
-loveCanvas.height = 256;
-const lCtx = loveCanvas.getContext('2d');
-lCtx.font = 'bold 120px "Segoe UI", sans-serif';
-lCtx.fillStyle = '#FF69B4';
-lCtx.textAlign = 'center';
-lCtx.shadowColor = "#FF1493";
-lCtx.shadowBlur = 40;
-lCtx.fillText("I LOVE YOU ❤️", 512, 130);
+            loveCanvas.width = 1024;
+            loveCanvas.height = 256;
+            const lCtx = loveCanvas.getContext('2d');
+            lCtx.font = 'bold 120px "Segoe UI", sans-serif';
+            lCtx.fillStyle = '#FF69B4';
+            lCtx.textAlign = 'center';
+            lCtx.shadowColor = "#FF1493";
+            lCtx.shadowBlur = 40;
+            lCtx.fillText("I LOVE YOU ❤️", 512, 130);
 
-const loveTex = new THREE.CanvasTexture(loveCanvas);
-const loveMat = new THREE.MeshBasicMaterial({
-    map: loveTex,
-    transparent: true,
-    blending: THREE.AdditiveBlending
-});
+            const loveTex = new THREE.CanvasTexture(loveCanvas);
+            const loveMat = new THREE.MeshBasicMaterial({
+                map: loveTex,
+                transparent: true,
+                blending: THREE.AdditiveBlending
+            });
 
-loveMesh = new THREE.Mesh(new THREE.PlaneGeometry(70, 18), loveMat);
-loveMesh.position.set(0, 0, 20);
-loveMesh.visible = false;
-scene.add(loveMesh);
+            loveMesh = new THREE.Mesh(new THREE.PlaneGeometry(70, 18), loveMat);
+            loveMesh.position.set(0, 0, 20);
+            loveMesh.visible = false;
+            scene.add(loveMesh);
             
         }
 
@@ -404,7 +404,7 @@ scene.add(loveMesh);
                 titleMesh.visible = false; starMesh.visible = false;
                 loveMesh.visible = false
                 const baseAngle = groupGold.rotation.y; 
-                const angleStep = (Math.PI * 2) / 5;
+                const angleStep = (Math.PI * 2) / photoMeshes.length;
                 let bestIdx = 0; let maxZ = -999;
 
                 photoMeshes.forEach((mesh, i) => {
@@ -463,12 +463,10 @@ scene.add(loveMesh);
 
             hands.onResults(results => {
                 if (results.multiHandLandmarks.length === 2) {
-                const h1 = results.multiHandLandmarks[0];
-                const h2 = results.multiHandLandmarks[1];
-
-                const distIndex = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
-                const distThumb = Math.hypot(h1[4].x - h2[4].x, h1[4].y - h2[4].y);
-
+                    const h1 = results.multiHandLandmarks[0];
+                    const h2 = results.multiHandLandmarks[1];
+                    const distIndex = Math.hypot(h1[8].x - h2[8].x, h1[8].y - h2[8].y);
+                    const distThumb = Math.hypot(h1[4].x - h2[4].x, h1[4].y - h2[4].y);
                 if (distIndex < 0.15 && distThumb < 0.15) {
                     state = 'HEART';
                     return;
@@ -485,9 +483,19 @@ scene.add(loveMesh);
                     let openDist = 0;
                     tips.forEach(i => openDist += Math.hypot(lm[i].x-wrist.x, lm[i].y-wrist.y));
                     const avgDist = openDist / 4;
+                    const isHeart =
+                        results.multiHandLandmarks.length === 2 &&
+                        pinch1 < 0.06 &&
+                        pinch2 < 0.06 &&
+                        indexDist < 0.20 &&
+                        avgDist > 0.28 && avgDist < 0.38
                     const pinchDist = Math.hypot(lm[4].x-lm[8].x, lm[4].y-lm[8].y);
-
-                    if (avgDist < 0.25) { 
+                    if (isHeart){
+                        state = 'HEART'; 
+                        console.log("heart")
+                        statusDiv.innerText = "🫶 I LOVE U"; statusDiv.style.color = "#FFD700";
+                    }
+                    else if (avgDist < 0.25) { 
                         state = 'TREE'; 
                         statusDiv.innerText = "✊ Về cây thông"; statusDiv.style.color = "#FFD700";
                     } else if (pinchDist < 0.05) {
