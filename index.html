@@ -126,9 +126,9 @@
         // 2. Vandiep
         // ==========================================
         const CONFIG = {
-            goldCount: 2000,    // Hạt vàng
-            redCount: 300,      // Số lượng đèn đỏ
-            giftCount: 150,     // Số lượng hộp quà
+            goldCount: 1200,    // Hạt vàng
+            redCount: 150,      // Số lượng đèn đỏ
+            giftCount: 50,     // Số lượng hộp quà
             explodeRadius: 65,  
             photoOrbitRadius: 25,
             treeHeight: 70,
@@ -459,7 +459,7 @@
             
             let frameCnt = 0;
             const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-            hands.setOptions({ maxNumHands: 2, modelComplexity: 0, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            hands.setOptions({ maxNumHands: 2, modelComplexity: 0, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
 
             hands.onResults(results => {
                 if (results.multiHandLandmarks.length === 2) {
@@ -511,11 +511,17 @@
                 }
             });
 
+            let lastHandTime = 0;
+
             const cameraUtils = new Camera(video, {
                 onFrame: async () => {
-                    frameCnt++; if(frameCnt%3 !== 0) return; 
-                    await hands.send({image: video});
-                }, width: 320, height: 240
+                    const now = performance.now();
+                    if (now - lastHandTime < 90) return; // ~11 FPS
+                    lastHandTime = now;
+                await hands.send({ image: video });
+                },
+                width: 320,
+                height: 240
             });
             cameraUtils.start();
         }
